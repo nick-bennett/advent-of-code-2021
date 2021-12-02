@@ -20,14 +20,16 @@ import com.nickbenn.advent.util.Parser;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
+import java.util.Map;
+import java.util.function.IntConsumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class Dive {
 
-  private static final Pattern COMMAND_PATTERN = Pattern.compile(
-      "^\\s*(?:forward\\s+(?<forward>\\d+)|down\\s+(?<down>\\d+)|up\\s+(?<up>\\d+))\\s*$");
+  private static final Pattern TOKENIZER =
+      Pattern.compile("^\\s*(?<command>forward|down|up)\\s+(?<argument>\\d+)\\s*$");
 
   private final List<String> data;
 
@@ -48,34 +50,43 @@ public class Dive {
 
   public long positionDotProduct() {
     int[] position = {0, 0};
+    Map<String, IntConsumer> processors = Map.of(
+        "forward", (steps) -> position[0] += steps,
+        "down", (steps) -> position[1] += steps,
+        "up", (steps) -> position[1] -= steps
+    );
     data
         .stream()
-        .map(COMMAND_PATTERN::matcher)
+        .map(TOKENIZER::matcher)
         .filter(Matcher::matches)
         .forEach((matcher) -> {
-          position[0] += parseInt(matcher.group("forward"), 0);
-          position[1] += parseInt(matcher.group("down"), 0) - parseInt(matcher.group("up"), 0);
+          processors
+              .getOrDefault(matcher.group("command"), (argument) -> {})
+              .accept(Integer.parseInt(matcher.group("argument")));
         });
     return (long) position[0] * position[1];
   }
 
   public long positionDotProductAim() {
     long[] position = {0, 0, 0};
+    Map<String, IntConsumer> processors = Map.of(
+        "forward", (steps) -> {
+          position[0] += steps;
+          position[2] += position[1] * steps;
+        },
+        "down", (steps) -> position[1] += steps,
+        "up", (steps) -> position[1] -= steps
+    );
     data
         .stream()
-        .map(COMMAND_PATTERN::matcher)
+        .map(TOKENIZER::matcher)
         .filter(Matcher::matches)
         .forEach((matcher) -> {
-          int forward = parseInt(matcher.group("forward"), 0);
-          position[0] += forward;
-          position[2] += position[1] * forward;
-          position[1] += parseInt(matcher.group("down"), 0) -  parseInt(matcher.group("up"), 0);
+          processors
+              .getOrDefault(matcher.group("command"), (argument) -> {})
+              .accept(Integer.parseInt(matcher.group("argument")));
         });
     return position[0] * position[2];
-  }
-
-  private int parseInt(String input, int emptyValue) {
-    return (input != null && !input.isEmpty()) ? Integer.parseInt(input) : emptyValue;
   }
 
 }
