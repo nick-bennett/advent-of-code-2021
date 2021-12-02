@@ -53,37 +53,29 @@ public class Dive {
         .map(COMMAND_PATTERN::matcher)
         .filter(Matcher::matches)
         .forEach((matcher) -> {
-          if (matcher.group("forward") != null) {
-            position[0] += Integer.parseInt(matcher.group("forward"));
-          } else if (matcher.group("down") != null) {
-            position[1] += Integer.parseInt(matcher.group("down"));
-          } else {
-            position[1] -= Integer.parseInt(matcher.group("up"));
-          }
+          position[0] += parseInt(matcher.group("forward"), 0);
+          position[1] += parseInt(matcher.group("down"), 0) - parseInt(matcher.group("up"), 0);
         });
     return (long) position[0] * position[1];
   }
 
   public long positionDotProductAim() {
-    int[] position = {0, 0, 0};
+    long[] position = {0, 0, 0};
     data
         .stream()
         .map(COMMAND_PATTERN::matcher)
         .filter(Matcher::matches)
         .forEach((matcher) -> {
-          if (matcher.group("forward") != null) {
-            int value = Integer.parseInt(matcher.group("forward"));
-            position[0] += value;
-            position[2] += position[1] * value;
-          } else if (matcher.group("down") != null) {
-            int value = Integer.parseInt(matcher.group("down"));
-            position[1] += value;
-          } else {
-            int value = Integer.parseInt(matcher.group("up"));
-            position[1] -= value;
-          }
+          int forward = parseInt(matcher.group("forward"), 0);
+          position[0] += forward;
+          position[2] += position[1] * forward;
+          position[1] += parseInt(matcher.group("down"), 0) -  parseInt(matcher.group("up"), 0);
         });
-    return (long) position[0] * position[2];
+    return position[0] * position[2];
+  }
+
+  private int parseInt(String input, int emptyValue) {
+    return (input != null && !input.isEmpty()) ? Integer.parseInt(input) : emptyValue;
   }
 
 }
