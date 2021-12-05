@@ -29,7 +29,6 @@ import java.util.stream.Stream;
 
 public class GiantSquid {
 
-  private static final Pattern PART_SPLITTER = Pattern.compile("(?:\\r?\\n){2}");
   private static final Pattern VALUE_SPLITTER = Pattern.compile("\\s*,\\s*");
   private static final Pattern ROW_SPLITTER = Pattern.compile("\\r?\\n");
   private static final Pattern COLUMN_SPLITTER = Pattern.compile("\\s+");
@@ -40,12 +39,12 @@ public class GiantSquid {
   public GiantSquid(String filename) throws URISyntaxException, IOException {
     int[] bitCount = {0};
     //noinspection ConstantConditions
-    String input = new Parser
+    String[] parts = new Parser
         .Builder(getClass().getResource(filename).toURI())
         .setTrimmed(true)
         .build()
-        .rawString();
-    String[] parts = PART_SPLITTER.split(input);
+        .lineGroupStream()
+        .toArray(String[]::new);
     numbersDrawn = VALUE_SPLITTER
         .splitAsStream(parts[0])
         .mapToInt(Integer::parseInt)
