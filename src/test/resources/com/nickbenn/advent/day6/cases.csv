@@ -1,0 +1,3 @@
+filename, generations, expected
+test.txt, 80, 5934
+test.txt, 256, 26984457539
