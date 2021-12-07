@@ -20,6 +20,7 @@ import com.nickbenn.advent.util.Parser;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -45,9 +46,9 @@ public class WhaleTreachery {
   }
 
   public static void main(String[] args) throws URISyntaxException, IOException {
-    WhaleTreachery whaleTreachery = new WhaleTreachery(Defaults.FILENAME);
-    System.out.println(whaleTreachery.getLinearFuelCost());
-    System.out.println(whaleTreachery.getTriangularFuelCost());
+    WhaleTreachery treachery = new WhaleTreachery(Defaults.FILENAME);
+    System.out.println(treachery.getLinearFuelCost());
+    System.out.println(treachery.getTriangularFuelCost());
   }
 
   public int getLinearFuelCost() {
@@ -62,10 +63,8 @@ public class WhaleTreachery {
     int step = (start > median) ? -1 : 1;
     int bestCost = Integer.MAX_VALUE;
     for (int position = start; position != median; position += step) {
-      int cost = getFuelCost(position, (value) -> value * (value + 1) / 2);
-      if (cost < bestCost) {
-        bestCost = cost;
-      }
+      bestCost = Math.min(bestCost,
+          getFuelCost(position, (diff) -> (diff * diff + Math.abs(diff)) / 2));
     }
     return bestCost;
   }
@@ -90,7 +89,7 @@ public class WhaleTreachery {
   private int getFuelCost(int position, IntUnaryOperator costFunction) {
     return IntStream
         .of(data)
-        .map((value) -> Math.abs(value - position))
+        .map((value) -> position - value)
         .map(costFunction)
         .sum();
   }
