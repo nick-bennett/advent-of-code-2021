@@ -19,8 +19,6 @@ import com.nickbenn.advent.util.Defaults;
 import com.nickbenn.advent.util.Parser;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Arrays;
-import java.util.function.Function;
 import java.util.function.IntUnaryOperator;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;

@@ -15,7 +15,7 @@
  */
 package com.nickbenn.advent.day7;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.nickbenn.advent.util.Defaults;
 import java.io.IOException;
